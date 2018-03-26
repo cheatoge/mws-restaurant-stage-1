@@ -5,6 +5,22 @@ var map;
 var markers = [];
 
 /**
+ * Descriptions of imgages ordered by ID
+ */
+const imageDescriptions = [
+  "People sitting in a crowded restaurant",
+  "Pizza on a plate",
+  "Empty interior of the restaurant",
+  "Entrance of the restaurant at night",
+  "Crowded interior of a pizzeria",
+  "Many people in a spacious restaurant",
+  "People sitting in small restaurant",
+  "Restaurant's signboard",
+  "People sitting at the table",
+  "Empty, modern interior of a restaurant"
+];
+
+/**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -141,7 +157,7 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = restaurant.image_alt;
+  image.alt = imageDescriptions[restaurant.id-1];
   li.append(image);
 
   const name = document.createElement('h1');

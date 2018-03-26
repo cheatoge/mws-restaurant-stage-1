@@ -1,5 +1,21 @@
 let restaurant;
-var map;
+let map;
+
+/**
+ * Descriptions of imgages ordered by ID
+ */
+const imageDescriptions = [
+  "People sitting in a crowded restaurant",
+  "Pizza on a plate",
+  "Empty interior of the restaurant",
+  "Entrance of the restaurant at night",
+  "Crowded interior of a pizzeria",
+  "Many people in a spacious restaurant",
+  "People sitting in small restaurant",
+  "Restaurant's signboard",
+  "People sitting at the table",
+  "Empty, modern interior of a restaurant"
+];
 
 /**
  * Initialize Google map, called from HTML.
@@ -58,7 +74,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = restaurant.image_alt;
+  image.alt = imageDescriptions[restaurant.id-1];
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
@@ -162,3 +178,11 @@ getParameterByName = (name, url) => {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
+
+/**
+ * Set focus on restaurant name
+ */
+setFocus = () => {
+    document.getElementById("restaurant-name").focus();
+};
+setFocus();
