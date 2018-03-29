@@ -115,6 +115,20 @@ nav h1 a {
 }
 
 /* ====================== Map ====================== */
+#skip-map {
+    position: absolute;
+    top: 40px;
+    left: 30px;
+}
+
+#skip-map a{
+    opacity: 0;
+}
+
+#skip-map a:focus {
+    opacity: 1;
+}
+
 #map {
     height: 400px;
     width: 100%;
