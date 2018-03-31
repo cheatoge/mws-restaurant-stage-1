@@ -1,6 +1,11 @@
-const staticCacheName = 'restaurant-reviews-static-v4';
+const staticCacheName = 'restaurant-reviews-static-v5';
+const contentImgsCache = 'restaurant-reviews-imgs';
+const allCaches = [
+  staticCacheName,
+  contentImgsCache
+];
 
-self.addEventListener('install', function (event) {
+  self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(staticCacheName)
       .then( cache => {
@@ -23,7 +28,7 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.filter(cacheName => {
-          return cacheName.startsWith('restaurant-reviews-') && cacheName !== staticCacheName;
+          return cacheName.startsWith('restaurant-reviews-') && !allCaches.includes(cacheName);
         }).map(cacheName => {
           return caches.delete(cacheName);
         })
@@ -33,6 +38,15 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  const requestUrl = new URL(event.request.url);
+
+  if (requestUrl.origin === location.origin) {
+    if (requestUrl.pathname.startsWith("/img/")) {
+      event.respondWith(servePhoto(event.request));
+      return
+    }
+  }
+
   event.respondWith(
     caches.match(event.request).then( response => {
       return response || fetch(event.request);
@@ -40,6 +54,17 @@ self.addEventListener('fetch', event => {
   );
 });
 
+function servePhoto(request) {
+  const storageUrl = request.url;
 
+  return caches.open(contentImgsCache).then(function(cache) {
+    return cache.match(storageUrl).then(function(response) {
+      if (response) return response;
 
-console.log("4");
+      return fetch(request).then(function(networkResponse) {
+        cache.put(storageUrl, networkResponse.clone());
+        return networkResponse;
+      });
+    });
+  });
+}

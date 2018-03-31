@@ -5,22 +5,6 @@ var map;
 var markers = [];
 
 /**
- * Descriptions of imgages ordered by ID
- */
-const imageDescriptions = [
-  "People sitting in a crowded restaurant",
-  "Pizza on a plate",
-  "Empty interior of the restaurant",
-  "Entrance of the restaurant at night",
-  "Crowded interior of a pizzeria",
-  "Many people in a spacious restaurant",
-  "People sitting in small restaurant",
-  "Restaurant's signboard",
-  "People sitting at the table",
-  "Empty, modern interior of a restaurant"
-];
-
-/**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -149,15 +133,38 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 };
 
 /**
+ * Descriptions of imgages ordered by ID
+ */
+const imageDescriptions = [
+  "People sitting in a crowded restaurant",
+  "Pizza on a plate",
+  "Empty interior of the restaurant",
+  "Entrance of the restaurant at night",
+  "Crowded interior of a pizzeria",
+  "Many people in a spacious restaurant",
+  "People sitting in small restaurant",
+  "Restaurant's signboard",
+  "People sitting at the table",
+  "Empty, modern interior of a restaurant"
+];
+
+/**
  * Create restaurant HTML.
  */
 createRestaurantHTML = (restaurant) => {
-  const li = document.createElement('li');
+  // Create link to responsive images based on basic link
+  function createResponsiveUrl(imgUrl, width) {
+    return `${imgUrl.slice(0, imgUrl.length-4)}-${width}${imgUrl.slice(imgUrl.length-4)}`;
+  }
 
+  const li = document.createElement('li');
   const image = document.createElement('img');
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  const imageSrc = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = createResponsiveUrl(imageSrc, 400);
+  image.srcset = `${createResponsiveUrl(imageSrc, 400)}, ${createResponsiveUrl(imageSrc, 800)} 2x`;
+  // Add alt texts from array declared way above
   image.alt = imageDescriptions[restaurant.id-1];
+  image.className = 'restaurant-img';
   li.append(image);
 
   const name = document.createElement('h1');

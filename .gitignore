@@ -1,2 +1,4 @@
 .idea
+image-backup
 run.bat
+node_modules

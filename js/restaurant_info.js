@@ -65,6 +65,11 @@ fetchRestaurantFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
+  // Create link to responsive images based on basic link
+  function createResponsiveUrl(imgUrl, width) {
+    return `${imgUrl.slice(0, imgUrl.length-4)}-${width}${imgUrl.slice(imgUrl.length-4)}`;
+  }
+
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
@@ -72,9 +77,12 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  const imageSrc = DBHelper.imageUrlForRestaurant(restaurant);
+  image.src = createResponsiveUrl(imageSrc, 400);
+  image.srcset = `${createResponsiveUrl(imageSrc, 400)} 400w, ${createResponsiveUrl(imageSrc, 800)} 800w`;
+  image.sizes = "(max-width: 550px) 400px, 800px";
   image.alt = imageDescriptions[restaurant.id-1];
+  image.className = 'restaurant-img';
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
