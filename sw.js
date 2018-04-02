@@ -5,6 +5,11 @@ const allCaches = [
   contentImgsCache
 ];
 
+/* Image sizes used on site */
+const imageSizes = [];
+imageSizes['small'] = 400;
+imageSizes['big'] = 800;
+
   self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(staticCacheName)
@@ -18,6 +23,19 @@ const allCaches = [
         'js/dbhelper.js',
         'js/restaurant_info.js',
         'css/styles.css'
+      ]);
+    }) && caches.open(contentImgsCache).then( cache => {
+      return cache.addAll([
+        'img/1-400.jpg',
+        'img/2-400.jpg',
+        'img/3-400.jpg',
+        'img/4-400.jpg',
+        'img/5-400.jpg',
+        'img/6-400.jpg',
+        'img/7-400.jpg',
+        'img/8-400.jpg',
+        'img/9-400.jpg',
+        'img/10-400.jpg'
       ]);
     })
   );
@@ -55,16 +73,51 @@ self.addEventListener('fetch', event => {
 });
 
 function servePhoto(request) {
-  const storageUrl = request.url;
 
-  return caches.open(contentImgsCache).then(function(cache) {
-    return cache.match(storageUrl).then(function(response) {
-      if (response) return response;
+  // Get some informations about image
+  const imageUrl = request.url;
+  const requestedSize = imageUrl.replace(/.*\D(?=\d)|\D+$/g, "");
+  const urlWithoutSize = request.url.replace(/-\d+\.jpg$/, '');
+  const smallImageUrl = `${urlWithoutSize}-${imageSizes['small']}.jpg`;
+  const bigImageUrl = `${urlWithoutSize}-${imageSizes['big']}.jpg`;
 
-      return fetch(request).then(function(networkResponse) {
-        cache.put(storageUrl, networkResponse.clone());
-        return networkResponse;
-      });
+  return caches.open(contentImgsCache).then( cache => {
+
+    /* Ask cache for big image, even if requested image is small. Maybe bigger version is already cached */
+    return cache.match(bigImageUrl).then( response => {
+      if (response) { return response;}
+
+      /* If there's no big image in cache, and requested image is big, try to fetch the big photo */
+      if(requestedSize == 800){
+        return fetch(request).then( networkResponse => {
+
+          /* If there's network connection, return fetched photo and delete smaller, as we don't need it anymore */
+          if(networkResponse){
+            cache.put(imageUrl, networkResponse.clone());
+            cache.delete(smallImageUrl);
+            return networkResponse;
+          }
+
+          /* Else, try to return smaller size if cached */
+          return cache.match(smallImageUrl).then( response => {
+            return response;
+          })
+        });
+      }
+
+      if(requestedSize == 400){
+
+        /* Return small image from cache, else fetch it */
+        return cache.match(smallImageUrl).then(response => {
+          if (response) return response;
+
+          return fetch(request).then(networkResponse => {
+            cache.put(imageUrl, networkResponse.clone());
+            return networkResponse;
+          })
+        })
+      }
+
     });
   });
 }
