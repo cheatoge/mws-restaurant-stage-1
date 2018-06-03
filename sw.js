@@ -22,7 +22,8 @@ imageSizes['big'] = 800;
         'js/index.js',
         'js/dbhelper.js',
         'js/restaurant_info.js',
-        'css/styles.css'
+        'css/styles.css',
+        'img/restaurant-default.svg',
       ]);
     }) && caches.open(contentImgsCache).then( cache => {
       return cache.addAll([
@@ -59,7 +60,8 @@ self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
   if (requestUrl.origin === location.origin) {
-    if (requestUrl.pathname.startsWith("/img/")) {
+    // little workaround for default svgs
+    if (requestUrl.pathname.startsWith("/img/") && !(requestUrl.pathname.endsWith("default.svg"))) {
       event.respondWith(servePhoto(event.request));
       return
     }

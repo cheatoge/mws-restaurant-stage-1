@@ -67,7 +67,7 @@ fetchRestaurantFromURL = (callback) => {
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   // Create link to responsive images based on basic link
   function createResponsiveUrl(imgUrl, width) {
-    return `${imgUrl.slice(0, imgUrl.length-4)}-${width}${imgUrl.slice(imgUrl.length-4)}`;
+    return `${imgUrl}-${width}.jpg`;
   }
 
   const name = document.getElementById('restaurant-name');
@@ -78,9 +78,14 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const image = document.getElementById('restaurant-img');
   const imageSrc = DBHelper.imageUrlForRestaurant(restaurant);
-  image.src = createResponsiveUrl(imageSrc, 400);
-  image.srcset = `${createResponsiveUrl(imageSrc, 400)} 400w, ${createResponsiveUrl(imageSrc, 800)} 800w`;
-  image.sizes = "(max-width: 550px) 400px, 800px";
+  if (imageSrc.endsWith('.svg')) {
+    image.src = imageSrc;
+  } else {
+    image.src = createResponsiveUrl(imageSrc, 400);
+    image.srcset = `${createResponsiveUrl(imageSrc, 400)} 400w, ${createResponsiveUrl(imageSrc, 800)} 800w`;
+    image.sizes = "(max-width: 550px) 400px, 800px";
+  }
+
   image.alt = imageDescriptions[restaurant.id-1];
   image.className = 'restaurant-img';
 

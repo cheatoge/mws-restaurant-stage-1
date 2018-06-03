@@ -154,14 +154,19 @@ const imageDescriptions = [
 createRestaurantHTML = (restaurant) => {
   // Create link to responsive images based on basic link
   function createResponsiveUrl(imgUrl, width) {
-    return `${imgUrl.slice(0, imgUrl.length-4)}-${width}${imgUrl.slice(imgUrl.length-4)}`;
+    return `${imgUrl}-${width}.jpg`;
   }
 
   const li = document.createElement('li');
   const image = document.createElement('img');
   const imageSrc = DBHelper.imageUrlForRestaurant(restaurant);
-  image.src = createResponsiveUrl(imageSrc, 400);
-  image.srcset = `${createResponsiveUrl(imageSrc, 400)}, ${createResponsiveUrl(imageSrc, 800)} 2x`;
+  if (imageSrc.endsWith('.svg')) {
+    image.src = imageSrc;
+  } else {
+    image.src = createResponsiveUrl(imageSrc, 400);
+    image.srcset = `${createResponsiveUrl(imageSrc, 400)}, ${createResponsiveUrl(imageSrc, 800)} 2x`;
+  }
+
   // Add alt texts from array declared way above
   image.alt = imageDescriptions[restaurant.id-1];
   image.className = 'restaurant-img';
