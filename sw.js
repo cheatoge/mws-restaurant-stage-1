@@ -17,10 +17,10 @@ imageSizes['big'] = 800;
       return cache.addAll([
         '/',
         '/restaurant.html',
-        'data/restaurants.json',
         'js/main.js',
         'js/index.js',
         'js/dbhelper.js',
+        'js/idb.js',
         'js/restaurant_info.js',
         'css/styles.css',
         'img/restaurant-default.svg',

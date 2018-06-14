@@ -16,6 +16,17 @@ class DBHelper {
    * Fetch all restaurants.
    */
 
+  static loadCachedRestaurants() {
+    if (!idbPromise) return;
+    return idbPromise.then((db) => {
+      const tx = db.transaction('restaurants');
+      const store = tx.objectStore('restaurants');
+      return store.getAll().then((restaurants) => {
+        return restaurants;
+      });
+    });
+  }
+
   static fetchRestaurants(callback) {
     fetch(DBHelper.DATABASE_URL, {
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -29,9 +40,24 @@ class DBHelper {
     }).then(resp => {
       return resp.json();
     }).then(restaurants => {
+      // put restaurants into idb for offline use
+      idbPromise.then((db) => {
+        if (!db) return;
+        const tx = db.transaction('restaurants', 'readwrite');
+        const store = tx.objectStore('restaurants');
+        restaurants.forEach((restaurant) => {
+          store.put(restaurant);
+        })
+      });
       callback(null, restaurants);
-    }).catch(e => console.error(e));
+    }).catch(e => {
+      console.error(e);
+      DBHelper.loadCachedRestaurants().then((restaurants) => {
+        callback(null, restaurants);
+      });
+    });
   }
+
   /**
    * Fetch a restaurant by its ID.
    */
@@ -151,7 +177,7 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    if (restaurant.photograph){
+    if (restaurant.photograph) {
       return (`/img/${restaurant.photograph}`);
     }
     return (`/img/restaurant-default.svg`);
@@ -162,13 +188,13 @@ class DBHelper {
    */
   static mapMarkerForRestaurant(restaurant, map) {
     const marker = new google.maps.Marker({
-      position: restaurant.latlng,
-      title: restaurant.name,
-      url: DBHelper.urlForRestaurant(restaurant),
-      map: map,
-      animation: google.maps.Animation.DROP}
+        position: restaurant.latlng,
+        title: restaurant.name,
+        url: DBHelper.urlForRestaurant(restaurant),
+        map: map,
+        animation: google.maps.Animation.DROP
+      }
     );
     return marker;
   }
-
 }
