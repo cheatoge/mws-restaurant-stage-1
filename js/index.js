@@ -3,7 +3,7 @@
  */
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js', {scope: "/"}).then(function (registration) {
+  navigator.serviceWorker.register('sw-min.js', {scope: "/"}).then(function (registration) {
     let serviceWorker;
     if (registration.installing) {
       serviceWorker = registration.installing;
