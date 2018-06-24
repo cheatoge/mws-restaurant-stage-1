@@ -17,13 +17,14 @@ imageSizes['big'] = 800;
       return cache.addAll([
         '/',
         '/restaurant.html',
-        'js/main.js',
-        'js/index.js',
-        'js/dbhelper.js',
-        'js/idb.js',
-        'js/restaurant_info.js',
+        'js/main-min.js',
+        'js/index-min.js',
+        'js/dbhelper-min.js',
+        'js/idb-min.js',
+        'js/restaurant_info-min.js',
         'css/styles.css',
         'img/restaurant-default.svg',
+        'manifest.json'
       ]);
     }) && caches.open(contentImgsCache).then( cache => {
       return cache.addAll([
@@ -60,6 +61,11 @@ self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
   if (requestUrl.origin === location.origin) {
+    if (requestUrl.pathname.startsWith("/restaurant.html")){
+      event.respondWith(serveTemplate(event.request));
+      return
+    }
+
     // little workaround for default svgs
     if (requestUrl.pathname.startsWith("/img/") && !(requestUrl.pathname.endsWith("default.svg"))) {
       event.respondWith(servePhoto(event.request));
@@ -73,6 +79,20 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
+function serveTemplate(request) {
+  const url = '/restaurant';
+  return caches.open(staticCacheName).then( cache => {
+    return cache.match(url).then( response => {
+      if (response) { return response;}
+
+      return fetch(request).then(networkResponse => {
+        cache.put(url, networkResponse.clone());
+        return networkResponse;
+      })
+    })
+  });
+}
 
 function servePhoto(request) {
 
