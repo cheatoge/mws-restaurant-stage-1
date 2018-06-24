@@ -6,6 +6,8 @@
 
 Restaurant reviews app was designed to help you choose restaurant in your neighborhood. The app is responsive, accessible and ready for offline use.
 
+This project use IndexedDB Promised library created by Jake Archibald.
+
 ## Quick start
 
 1. Run `npm install` to install dependencies.
